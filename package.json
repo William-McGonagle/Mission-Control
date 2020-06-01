@@ -1,0 +1,30 @@
+{
+  "name": "ms_ctrl",
+  "version": "1.0.0",
+  "description": "An app that lets users launch and manage rockets.",
+  "main": "app/index.js",
+  "dependencies": {
+    "electron": "^9.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/William-McGonagle/Mission-Control.git"
+  },
+  "keywords": [
+    "rockets",
+    "ms_ctrl",
+    "mission",
+    "control"
+  ],
+  "author": "William McGonagle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/William-McGonagle/Mission-Control/issues"
+  },
+  "homepage": "https://github.com/William-McGonagle/Mission-Control#readme"
+}
