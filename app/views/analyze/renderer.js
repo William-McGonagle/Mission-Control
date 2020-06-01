@@ -1,168 +1,189 @@
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var renderer = new THREE.WebGLRenderer();
+'use strict';
 
-document.addEventListener('mousemove', onDocumentMouseMove, false);
-window.addEventListener('resize', onWindowResize, false);
-document.addEventListener('mousedown', onMouseDown, false);
+Physijs.scripts.worker = '../physijs_worker.js';
+Physijs.scripts.ammo = 'examples/js/ammo.js';
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMapEnabled = true;
-renderer.shadowMapType = THREE.PCFSoftShadowMap;
-document.body.appendChild(renderer.domElement);
+var initScene, render, createShape, NoiseGen, loader,
+  renderer, render_stats, physics_stats, scene, light, ground, ground_geometry, ground_material, camera;
+var rocketShape;
+var fuel = 65;
 
-// Simulation
+NoiseGen = new SimplexNoise;
 
-var fuel = 200;
+initScene = function() {
+  TWEEN.start();
 
-var rocketVelocity = {
-  x: 0,
-  y: 0,
-  z: 0
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMapSoft = true;
+  document.getElementById( 'viewport' ).appendChild( renderer.domElement );
+
+  // render_stats = new Stats();
+  // render_stats.domElement.style.position = 'absolute';
+  // render_stats.domElement.style.top = '0px';
+  // render_stats.domElement.style.zIndex = 100;
+  // document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
+  //
+  // physics_stats = new Stats();
+  // physics_stats.domElement.style.position = 'absolute';
+  // physics_stats.domElement.style.top = '50px';
+  // physics_stats.domElement.style.zIndex = 100;
+  // document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
+
+  scene = new Physijs.Scene({ fixedTimeStep: 1 / 120 });
+  scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
+  scene.addEventListener(
+    'update',
+    function() {
+      scene.simulate( undefined, 2 );
+
+      if (fuel > 0) {
+
+        rocketShape.applyCentralImpulse(new THREE.Vector3(0, 1, 0).applyMatrix4(rocketShape.matrix));
+        fuel--;
+
+      }
+
+      rocketShape.applyCentralImpulse(new THREE.Vector3(Math.random() * rocketShape.position.y / 50, 0, Math.random() * rocketShape.position.y / 50));
+
+      displayCamera(0);
+
+    }
+  );
+
+  camera = new THREE.PerspectiveCamera(
+    35,
+    window.innerWidth / window.innerHeight,
+    1,
+    1000
+  );
+  camera.position.set( 60, 50, 60 );
+  scene.add( camera );
+
+  // Light
+  light = new THREE.DirectionalLight( 0xFFFFFF );
+  light.position.set( 20, 40, -15 );
+  light.target.position.copy( scene.position );
+  light.castShadow = true;
+  light.shadowCameraLeft = -60;
+  light.shadowCameraTop = -60;
+  light.shadowCameraRight = 60;
+  light.shadowCameraBottom = 60;
+  light.shadowCameraNear = 20;
+  light.shadowCameraFar = 200;
+  light.shadowBias = -.0001
+  light.shadowMapWidth = light.shadowMapHeight = 2048;
+  light.shadowDarkness = .7;
+  scene.add( light );
+
+  // Loader
+  loader = new THREE.TextureLoader();
+
+  // Materials
+  ground_material = Physijs.createMaterial(
+    new THREE.MeshLambertMaterial({ map: loader.load( 'images/grass.png' ) }),
+    .8, // high friction
+    .5 // low restitution
+  );
+  ground_material.map.wrapS = ground_material.map.wrapT = THREE.RepeatWrapping;
+  ground_material.map.repeat.set( 25.0, 25.0 );
+
+  // Ground
+
+  ground_geometry = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
+  for ( var i = 0; i < ground_geometry.vertices.length; i++ ) {
+    var vertex = ground_geometry.vertices[i];
+    vertex.z = NoiseGen.noise( vertex.x / 500, (vertex.y / 500)) * 20;
+  }
+  ground_geometry.computeFaceNormals();
+  ground_geometry.computeVertexNormals();
+
+  // If your plane is not square as far as face count then the HeightfieldMesh
+  // takes two more arguments at the end: # of x faces and # of y faces that were passed to THREE.PlaneMaterial
+  ground = new Physijs.HeightfieldMesh(
+    ground_geometry,
+    ground_material,
+    0, // mass
+    100,
+    100
+  );
+  ground.rotation.x = Math.PI / -2;
+  ground.receiveShadow = true;
+  scene.add( ground );
+
+  requestAnimationFrame( render );
+  scene.simulate();
+
+  createLandingPad();
+  createRocket();
+
 };
 
-// TERRAIN
+function displayCamera(index) {
 
-var terrainGeometry = new THREE.PlaneGeometry(1000, 1000, 150, 150);
+  switch (index) {
+    case 0:
 
-for (var i = 0, l = terrainGeometry.vertices.length; i < l; i++) {
+    camera.lookAt(rocketShape.position);
 
-  terrainGeometry.vertices[i].z = noise.simplex2((i % 148) / 100, (i / 148) / 50) * 25;
+      break;
+    case 1:
+
+    // camera.lookAt(rocketShape.position);
+    camera.localPosition = new THREE.Vector3(0, 0, -2);
+    camera.parent = rocketShape;
+    // camera.position = new THREE.Vector3(0, 5, -5);
+
+      break;
+    default:
+
+  }
 
 }
 
-var ground = new THREE.Mesh(
-  terrainGeometry,
-  new THREE.MeshLambertMaterial({
-    color: 0x33ee33,
-    side: THREE.DoubleSide,
-    castShadow: true
-  })
-);
-
-ground.rotation.x = 90;
-
-var rocket = new THREE.Mesh(
-  new THREE.BoxGeometry(0.4, 1.6, 0.4),
-  new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    castShadow: true
-  })
-);
-
-rocket.position.y = 0.8;
-
-var launchPad = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 0.2, 1),
-  new THREE.MeshLambertMaterial({
-    color: 0xff0000,
-    castShadow: true
-  })
-);
-
-var lineGeometry = new THREE.Geometry();
-
-lineGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-lineGeometry.vertices.push(rocket.position);
-
-var line = new THREE.Line(
-  lineGeometry,
-  new THREE.LineBasicMaterial({
-    color: 0x0000ff,
-    castShadow: true
-  })
-);
-
-var ambientLight = new THREE.AmbientLight(0x101010, 5.0);
-ambientLight.castShadow = true;
-ambientLight.shadowDarkness = 0.5;
-ambientLight.shadowCameraVisible = true;
-
-directionalLight = new THREE.DirectionalLight(0xffffff, 3.0);
-directionalLight.position.set(0.0, 0.0, 20.0);
-directionalLight.rotation.x = 50;
-directionalLight.castShadow = true;
-directionalLight.shadowDarkness = 0.5;
-directionalLight.shadowCameraVisible = true;
-
-scene.add(ambientLight);
-scene.add(directionalLight);
-scene.add(ground);
-scene.add(rocket);
-scene.add(launchPad);
-scene.add(line);
-
-function animate() {
-
-  requestAnimationFrame(animate);
-
-  camera.position.x = rocket.position.x;
-  camera.position.y = rocket.position.y + 1;
-  camera.position.z = rocket.position.z + 5;
-
-  rocket.position.x += rocketVelocity.x;
-  rocket.position.y += rocketVelocity.y;
-  rocket.position.z += rocketVelocity.z;
-
-  lineGeometry.vertices[0].copy(new THREE.Vector3(0, 0, 0));
-  lineGeometry.vertices[1].copy(rocket.position);
-  lineGeometry.verticesNeedUpdate = true;
-
-  if (rocket.position.y > 1.6) {
-
-    rocketVelocity.y -= 0.005; // Gravity
-
-  } else {
-
-    rocket.position.y = 1.6;
-
-  }
-
-  if (fuel > 0) {
-
-    rocketVelocity.y += rocket.up.y * 0.01;
-    rocketVelocity.x += rocket.up.x * 0.01;
-    rocketVelocity.z += rocket.up.z * 0.01;
-    fuel--;
-
-  }
-
-  camera.lookAt(rocket.position);
+render = function() {
+  requestAnimationFrame(render);
   renderer.render(scene, camera);
+  // render_stats.update();
+};
+
+function createRocket() {
+
+  var rocketGeometry = new THREE.BoxGeometry( 0.6, 3, 0.6 );
+
+  rocketShape = new Physijs.BoxMesh(
+    rocketGeometry,
+    new THREE.MeshLambertMaterial({
+      color: 0x0000ff,
+      castShadow: true,
+      receiveShadow: true
+    }),
+    10
+  );
+
+  rocketShape.position.y = 8.5;
+
+  scene.add(rocketShape);
 
 }
 
-animate();
+function createLandingPad() {
 
-function onDocumentMouseMove(event) {
-    event.preventDefault();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
+  var landingPadGeometry = new THREE.BoxGeometry( 10, 10, 10 );
 
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
+  var landingPadShape = new Physijs.BoxMesh(
+    landingPadGeometry,
+    new THREE.MeshLambertMaterial({
+      color: 0xff0000,
+      castShadow: true,
+      receiveShadow: true
+    }),
+    0
+  );
 
-function manageRaycasterIntersections(scene, camera) {
-    camera.updateMatrixWorld();
-    raycaster.setFromCamera(mouse, camera);
-    var intersects = raycaster.intersectObjects(scene.children);
-
-    if (intersects.length > 0) {
-
-    }
-    else {
-
-    }
-}
-
-function onMouseDown(event){
-
-   console.log("mouse position: (" + mouse.x + ", "+ mouse.y + ")");
+  scene.add(landingPadShape);
 
 }
+
+window.onload = initScene;

@@ -1,0 +1,74 @@
+*
+  box-sizing: border-box
+  font-family: sans-serif
+
+.sidebar
+  position: fixed
+  top: 0px
+  bottom: 0px
+  left: 0px
+  width: 30vw
+  // background: red
+
+  div
+    margin: 10px
+    border: 1px solid #ddd
+    border-radius: 5px
+    padding: 10px 25px
+
+    ul
+      padding: 0px
+      padding-left: 10px
+      list-style: none
+      font-weight: 900
+
+      li
+        margin: 10px 0px
+        color: #333
+
+      a
+        text-decoration: none
+        color: #333
+
+        &:hover
+          color: #666
+
+      ul
+        font-weight: 400
+
+        li
+          margin: 0px 0px
+
+.launches
+  height: 300px
+  position: absolute
+  left: 25px
+  right: 25px
+  overflow-x: scroll
+  overflow-y: hidden
+  white-space: nowrap
+  border-radius: 5px
+  padding: 0px
+
+  img
+    padding: 0px
+    margin: 0px 10px
+    border-radius: 5px
+
+.main
+  position: fixed
+  top: 0px
+  bottom: 0px
+  left: 30vw
+  right: 0px
+  overflow-y: scroll
+  // background: red
+
+  fieldset
+    margin: 10px
+    border-radius: 5px
+    padding: 10px 25px
+    border: 1px solid #ddd
+
+    legend
+      font-weight: 900

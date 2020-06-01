@@ -3,7 +3,7 @@ var currentWindow = remote.getCurrentWindow();
 
 window.onload = function () {
 
-  function createBrowserWindow(url) {
+  function createBrowserWindow(url, frame) {
     const BrowserWindow = remote.BrowserWindow;
     const win = new BrowserWindow({
       height: 600,
@@ -12,7 +12,7 @@ window.onload = function () {
         nodeIntegration: true,
         enableRemoteModule: true
       },
-      frame: false
+      frame: frame
     });
 
     win.loadFile(url);
@@ -21,7 +21,7 @@ window.onload = function () {
   // Back
   document.getElementById("back").onclick = function () {
 
-    createBrowserWindow("app/views/main/index.html");
+    createBrowserWindow("app/views/main/index.html", false);
     currentWindow.close();
 
   }
@@ -29,7 +29,23 @@ window.onload = function () {
   // Create Project
   document.getElementById("create").onclick = function () {
 
-    alert('create pressed');
+    var fs = remote.require('fs');
+
+    var projectName = document.getElementById("projectName");
+    var projectCreator = document.getElementById("projectCreator");
+
+    if (!fs.existsSync("./projects/" + projectName.value + "/")) fs.mkdirSync("./projects/" + projectName.value + "/");
+    fs.writeFileSync("./projects/" + projectName.value + "/manifest.json", JSON.stringify({
+      projectName: projectName.value,
+      projectCreator: projectCreator.value
+    }, null, 4));
+
+    var windowData = createBrowserWindow("app/views/project/index.html", false);
+    windowData.custom = {
+      'projectId': projectName.value
+    };
+
+    currentWindow.close();
 
   }
 
