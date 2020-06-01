@@ -6,7 +6,8 @@ function createWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     },
     frame: false
   });
@@ -21,7 +22,7 @@ app.on('window-all-closed', () => {
 
   if (process.platform !== 'darwin') {
 
-    app.quit()
+    app.quit();
 
   }
 
@@ -29,8 +30,8 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
 
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
+  // if (BrowserWindow.getAllWindows().length === 0) {
+  //   createWindow()
+  // }
 
 });
