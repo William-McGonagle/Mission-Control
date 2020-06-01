@@ -1,5 +1,61 @@
 * {
   font-family: sans-serif;
+  color: #333;
+}
+
+.logo {
+  position: fixed;
+  top: 0px;
+  right: 20vw;
+  left: 20vw;
+  height: 30vh;
+  text-align: center;
+  padding: 10vh 0px;
+  font-size: 3vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+.optionsLeft {
+  position: fixed;
+  top: 30vh;
+  left: 1vw;
+  right: 50vw;
+  bottom: 1vw;
+  background: #fff;
+}
+.optionsLeft div {
+  margin: 1vw 2vw;
+  text-align: center;
+  border: 1px solid #eee;
+  border-radius: 1vw;
+  padding: 7vh;
+  font-size: 3vh;
+}
+.optionsLeft div:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+.optionsRight {
+  position: fixed;
+  top: 30vh;
+  left: 50vw;
+  right: 1vw;
+  bottom: 1vw;
+  background: #fff;
+}
+.optionsRight div {
+  margin: 1vw;
+  text-align: center;
+  border: 1px solid #eee;
+  border-radius: 1vw;
+  padding: 7vh;
+  font-size: 3vh;
+}
+.optionsRight div:hover {
+  background: #eee;
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=style.css.map */

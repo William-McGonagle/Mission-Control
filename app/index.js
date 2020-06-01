@@ -11,7 +11,7 @@ function createWindow () {
     frame: false
   });
 
-  win.loadFile('index.html');
+  win.loadFile('app/views/main/index.html');
 
 }
 
