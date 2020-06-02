@@ -42,10 +42,10 @@ window.onload = function () {
 
   }
 
-  // Simulation
+  // Launchpad
   document.getElementById("4").onclick = function () {
 
-    createBrowserWindow("app/views/simulate/index.html");
+    createBrowserWindow("app/views/launchpad/index.html");
     currentWindow.close();
 
   }

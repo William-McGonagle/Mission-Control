@@ -1,0 +1,68 @@
+* {
+  outline: none;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  color: #333;
+}
+
+h3 {
+  font-size: 5vh;
+}
+
+.header {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: 40vh;
+  text-align: center;
+  padding: 10vh;
+}
+
+.config {
+  position: fixed;
+  left: 25vw;
+  right: 25vw;
+  bottom: 40vh;
+  top: 30vh;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.configDropdown {
+  position: absolute;
+  left: 25px;
+  right: 25px;
+  top: 25px;
+  height: 10vh;
+}
+.configDropdown select {
+  width: 100%;
+  height: 100%;
+  padding: 3vh;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  color: #333;
+}
+
+.configButton {
+  position: absolute;
+  left: 25px;
+  right: 25px;
+  bottom: 25px;
+  height: 10vh;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  background: #9a009a;
+  color: white;
+  padding: 3vh;
+}
+.configButton:hover {
+  background: #b300b3;
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=style.css.map */

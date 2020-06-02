@@ -1,0 +1,53 @@
+RKT: V1
+SCALE: 5
+LAUNCH_TITLE: Example 1
+LAUNCH_DATE: 1591056056
+
+
+POS_X: 0
+POS_Y: 0
+POS_Z: 0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
+
+POS_X: 0
+POS_Y: 5
+POS_Z: 0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
+
+POS_X: 0
+POS_Y: 15
+POS_Z: 0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
+
+POS_X: 0
+POS_Y: 10.1
+POS_Z: 0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
+
+POS_X: 0
+POS_Y: 2
+POS_Z: 0.0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
+
+POS_X: 0
+POS_Y: 0
+POS_Z: 0
+ROT_X: 0
+ROT_Y: 0
+ROT_Z: 0
+ROT_W: 0
